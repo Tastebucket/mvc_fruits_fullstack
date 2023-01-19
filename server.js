@@ -7,11 +7,14 @@ const morgan = require('morgan')  // import morgan request logger
 require('dotenv').config() // Load my ENV file's variables
 const path = require('path')
 const FruitRouter = require('./controllers/fruitControllers')
+const UserRouter = require('./controllers/userControllers')
+const CommentRouter = require('./controllers/commentControllers')
 const middleware = require('./utils/middleware')
 
 ///////////////////////////////////
 ///  Create Express App Object  ///
 ///////////////////////////////////
+
 const app = express()
 
 
@@ -30,6 +33,8 @@ app.get('/', (req, res) => {
 })
 
 app.use('/fruits', FruitRouter)
+app.use('/users', UserRouter)
+app.use('/comments', CommentRouter)
 
 ///////////////////////////////////
 ///        Server Listener      ///
