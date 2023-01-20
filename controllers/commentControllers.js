@@ -40,7 +40,8 @@ router.post('/:fruitId', (req, res) => {
             })
             // respond with a 201 and the fruit itself
             .then(fruit => {
-                res.status(201).json({ fruit: fruit })
+                //res.status(201).json({ fruit: fruit })
+                res.redirect(`/fruits/${fruit.id}`)
             })
             // catch and handle any errors
             .catch(err => {
@@ -68,7 +69,8 @@ router.delete('/delete/:fruitId/:commId', (req, res) => {
                 if (theComment.author == req.session.userId) {
                     theComment.remove()
                     fruit.save()
-                    res.sendStatus(204)
+                    //res.sendStatus(204)
+                    res.redirect(`/fruits/${fruit.id}`)
                 } else{
                     res.sendStatus(401)
                 }

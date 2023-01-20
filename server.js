@@ -43,7 +43,7 @@ app.use('/comments', CommentRouter)
 app.get('/error', (req,res) => {
     const error = req.query.error || 'This page does not exist'
     const { username, loggedIn, userId } = req.session
-    res.render('home.liquid', { username, loggedIn, userId })
+    res.render('error.liquid', { username, loggedIn, userId })
 })
 // catchall route
 app.all('*', (req,res) => {

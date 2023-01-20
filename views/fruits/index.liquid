@@ -12,12 +12,17 @@
             </h5>
             <div class="card-body">
               <p class="card-text">The color of this {{ fruit.name }} is {{ fruit.color }}. It is owned by {{ fruit.owner.username }}</p>
+              <div class="colorBox mb-2" style="background-color: {{fruit.color}}"></div>
+              <a href="/fruits/{{fruit.id}}" class="btn btn-info">View {{ fruit.name }}</a>
+              <p>{{ fruit.comments.length }} comments</p>
             </div>
           </div>
         {% endfor %}
       </div>
     </div>
   {% else %}
-    <h2>No fruits yet... Go create some!</h2>
+    <div class="container-md">
+      <h2>No fruits yet... Go create some!</h2>
+    </div>
   {% endif %}
 {% endblock %}

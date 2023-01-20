@@ -1,158 +1,3 @@
-// /////////////////////////////////////
-// //// Import Dependencies         ////
-// /////////////////////////////////////
-// const express = require('express')
-// const Fruit = require('../models/fruit')
-
-// /////////////////////////////////////
-// //// Create Router               ////
-// /////////////////////////////////////
-// const router = express.Router()
-
-// //////////////////////////////
-// //// Routes               ////
-// //////////////////////////////
-
-// // INDEX route 
-// // Read -> finds and displays all fruits
-// router.get('/', (req, res) => {
-//     // find all the fruits
-//     Fruit.find({})
-//         // there's a built in function that runs before the rest of the pchain
-//         // 
-//         .populate('owner', '-password')
-//         .populate('comments.author', '-password')
-//         // send json if successful
-//         .then(fruits => { 
-//             // res.json({ fruits: fruits })
-//             // now that we have liquid installed, we're going to use render as a response for our controllers
-//             res.render('fruits/index', { fruits,username, loggedIn, userId })
-//         })
-//         // catch errors if they occur
-//         .catch(err => {
-//             console.log(err)
-//             res.status(404).json(err)
-//         })
-// })
-
-// // CREATE route
-// // Create -> receives a request body, and creates a new document in the database
-// router.post('/', (req, res) => {
-//     // here, we'll have something called a request body
-//     // inside this function, that will be called req.body
-//     // we want to pass our req.body to the create method
-//     req.body.owner = req.session.userId
-//     const newFruit = req.body
-//     Fruit.create(newFruit)
-//         // send a 201 status, along with the json response of the new fruit
-//         .then(fruit => {
-//             res.status(201).json({ fruit: fruit.toObject() })
-//         })
-//         // send an error if one occurs
-//         .catch(err => {
-//             console.log(err)
-//             res.status(404).json(err)
-//         })
-// })
-
-// //GET route
-// //Index-> This is a user specific index route
-// //This will only show the logged in user's fruits
-// router.get('/mine', (req, res) => {
-//     Fruit.find({ owner: req.session.userId })
-//         .populate('owner', '-password')
-//         .then( fruits => {
-//             res.status(200).json({fruits: fruits})
-//         })
-//         .catch (err=>{
-//             console.log(err)
-//             res.status(400).json(err)
-//         })
-// })
-
-// // // PUT route
-// // // Update -> updates a specific fruit
-// // // PUT replaces the entire document with a new document from the req.body
-// // // PATCH is able to update specific fields at specific times, but it requires a little more code to ensure that it works properly, so we'll use that later
-// // router.put('/:id', (req, res) => {
-// //     // save the id to a variable for easy use later
-// //     const id = req.params.id
-// //     // save the request body to a variable for easy reference later
-// //     const updatedFruit = req.body
-// //     // we're going to use the mongoose method:
-// //     // findByIdAndUpdate
-// //     // eventually we'll change how this route works, but for now, we'll do everything in one shot, with findByIdAndUpdate
-// //     Fruit.findByIdAndUpdate(id, updatedFruit, { new: true })
-// //         .then(fruit => {
-// //             console.log('the newly updated fruit', fruit)
-// //             // update success message will just be a 204 - no content
-// //             res.sendStatus(204)
-// //         })
-// //         .catch(err => {
-// //             console.log(err)
-// //             res.status(404).json(err)
-// //         })
-// // })
-
-// // PUT route
-// router.put('/:id', (req, res)=> {
-//     const id = req.params.id
-//     Fruit.findById(id)
-//         .then(fruit => {
-//             if (fruit.owner == req.session.userId) {
-//                 res.sendStatus(204)
-//                 return fruit.updateOne(req.body)
-//             } else {
-//                 res.sendStatus(401)
-//             }
-//         })
-//         .catch(err => {
-//             console.log(err)
-//             res.status(400).json(err)
-//         })
-// })
-
-// router.delete('/:id', (req, res)=> {
-//     const id = req.params.id
-//     Fruit.findById(id)
-//         .then(fruit => {
-//             if (fruit.owner == req.session.userId) {
-//                 res.sendStatus(204)
-//                 return fruit.deleteOne(req.body)
-//             } else {
-//                 res.sendStatus(401)
-//             }
-//         })
-//         .catch(err => {
-//             console.log(err)
-//             res.status(400).json(err)
-//         })
-// })
-
-// // SHOW route
-// // Read -> finds and displays a single resource
-// router.get('/:id', (req, res) => {
-//     // get the id -> save to a variable
-//     const id = req.params.id
-//     // use a mongoose method to find using that id
-//     Fruit.findById(id)
-//         .populate('comments.author', 'username')
-//         // send the fruit as json upon success
-//         .then(fruit => {
-//             res.json({ fruit: fruit })
-//         })
-//         // catch any errors
-//         .catch(err => {
-//             console.log(err)
-//             res.status(404).json(err)
-//         })
-// })
-
-
-// //////////////////////////////
-// //// Export Router        ////
-// //////////////////////////////
-// module.exports = router
 
 /////////////////////////////////////
 //// Import Dependencies         ////
@@ -187,9 +32,15 @@ router.get('/', (req, res) => {
         })
         // catch errors if they occur
         .catch(err => {
-            console.log(err)
-            res.status(404).json(err)
+            // res.status(404).json(err)
+            res.redirect(`/error?error=${err}`)
         })
+})
+
+// GET for the new page
+// shows a form to create a new fruit
+router.get('/new', (req, res) => {
+    res.render('fruits/new', { ...req.session })
 })
 
 // CREATE route
@@ -202,17 +53,19 @@ router.post('/', (req, res) => {
     // we want to add an owner field to our fruit
     // luckily for us, we saved the user's id on the session object, so it's really easy for us to access that data
     req.body.owner = req.session.userId
+    req.body.readyToEat = req.body.readyToEat === 'on' ? true : false
     const newFruit = req.body
     // console.log('this is req.body aka newFruit, after owner', newFruit)
     Fruit.create(newFruit)
         // send a 201 status, along with the json response of the new fruit
         .then(fruit => {
-            res.status(201).json({ fruit: fruit.toObject() })
+            //res.status(201).json({ fruit: fruit.toObject() })
+            res.redirect(`/fruits/${fruit.id}`)
         })
         // send an error if one occurs
         .catch(err => {
-            console.log(err)
-            res.status(404).json(err)
+            // res.status(404).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 
@@ -226,35 +79,52 @@ router.get('/mine', (req, res) => {
         .populate('comments.author', '-password')
         .then(fruits => {
             // if found, display the fruits
-            res.status(200).json({ fruits: fruits })
+            res.render('fruits/index', { fruits, ...req.session })
         })
         .catch(err => {
             // otherwise throw an error
-            console.log(err)
-            res.status(400).json(err)
+            // res.status(400).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
+
+//GET -> edit route
+router.get('/edit/:id', (req,res) => {
+    const fruitId = req.params.id
+    Fruit.findById(fruitId)
+        .then(fruit => {
+            res.render('fruits/edit', {fruit, ...req.session})
+        })
+        .catch(err=> {
+            res.redirect(`/error?error=${err}`)
+        })
+})
+
 
 // PUT route
 // Update -> updates a specific fruit(only if the fruit's owner is updating)
 router.put('/:id', (req, res) => {
     const id = req.params.id
+    req.body.readyToEat = req.body.readyToEat === 'on' ? true : false
     Fruit.findById(id)
         .then(fruit => {
             // if the owner of the fruit is the person who is logged in
             if (fruit.owner == req.session.userId) {
                 // send success message
-                res.sendStatus(204)
+                // res.sendStatus(204)
                 // update and save the fruit
                 return fruit.updateOne(req.body)
             } else {
                 // otherwise send a 401 unauthorized status
-                res.sendStatus(401)
+                res.redirect(`/error?error=You%20Are%20not%20allowed%20to%20edit%20this%20fruit`)
             }
         })
+        .then(() => {
+            res.redirect('/fruits/mine')
+        })
         .catch(err => {
-            console.log(err)
-            res.status(400).json(err)
+            // res.status(400).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 
@@ -267,17 +137,18 @@ router.delete('/:id', (req, res) => {
             // if the owner of the fruit is the person who is logged in
             if (fruit.owner == req.session.userId) {
                 // send success message
-                res.sendStatus(204)
+                //res.sendStatus(204)
                 // delete the fruit
+                res.redirect('/fruits/mine')
                 return fruit.deleteOne()
             } else {
-                // otherwise send a 401 unauthorized status
-                res.sendStatus(401)
+                // res.sendStatus(401)
+                res.redirect(`/error?error=You%20Are%20not%20allowed%20to%20delete%20this%20fruit`)
             }
         })
         .catch(err => {
-            console.log(err)
-            res.status(400).json(err)
+            // res.status(400).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 
@@ -291,12 +162,12 @@ router.get('/:id', (req, res) => {
         .populate('comments.author', 'username')
         // send the fruit as json upon success
         .then(fruit => {
-            res.json({ fruit: fruit })
+            res.render('fruits/show', {fruit, ...req.session})
         })
         // catch any errors
         .catch(err => {
-            console.log(err)
-            res.status(404).json(err)
+            // res.status(404).json(err)
+            res.redirect(`/error?error=${err}`)
         })
 })
 

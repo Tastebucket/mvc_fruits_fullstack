@@ -1,0 +1,67 @@
+{% layout 'layout.liquid' %}
+{% block content %}
+  <div class="container-md">
+    <article>
+      <h2>{{ fruit.name }}</h2>
+      <h4>
+        {% if fruit.readyToEat %}
+          Ripe and Ready
+        {% else %}
+          Not Ripe! Do Not Eat!
+        {% endif %}
+      </h4>
+      <h4>The color of the fruit is: {{ fruit.color }}</h4>
+      <div class="colorBox" style="background-color: {{fruit.color}}"></div>
+      {% if fruit.owner == userId %}
+        <hr>
+        <div class="btn-group">
+          {%- comment -%}
+          first button will take us to the edit page
+          second will actually be a form, that calls our delete route
+          {%- endcomment -%}
+          <a href="/fruits/edit/{{fruit.id}}" class="btn btn-primary">Edit {{ fruit.name }}</a>
+          <form action="/fruits/{{fruit.id}}?_method=DELETE" method="POST">
+            <input
+              type="submit"
+              class="btn btn-danger"
+              value="Delete {{fruit.name}}">
+          </form>
+        </div>
+      {% endif %}
+    </article>
+    <hr>
+    <h4>comments</h4>
+    <hr>
+    {% if loggedIn %}
+      <div class="col-md-6">
+        <form action="/comments/{{ fruit.id}}" method="POST">
+          <fieldset>
+            <legend>Add Comment</legend>
+            <label class="form-label">comment:</label>
+            <input
+              type="text"
+              name="note"
+              class="form-control mb-1">
+          </fieldset>
+          <input type="submit" class="">
+        </form>
+      </div>
+    {% else %}
+      <div class="col-md-6">
+        <small>You must be logged in to comment...</small>
+      </div>
+    {% endif %}
+    <hr>
+    {% if fruit.comments.length > 0 %}
+      <div class="container-sm justify-content-center">
+        {% for comm in fruit.comments %}
+          {% render '../comment.liquid', comm: comm, userId: userId, fruit: fruit %}
+        {% endfor %}
+      </div>
+    {% else %}
+      <small>
+        no comments yet...
+      </small>
+    {% endif %}
+  </div>
+{% endblock %}
