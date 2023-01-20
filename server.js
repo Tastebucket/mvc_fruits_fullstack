@@ -14,8 +14,11 @@ const middleware = require('./utils/middleware')
 ///////////////////////////////////
 ///  Create Express App Object  ///
 ///////////////////////////////////
-
-const app = express()
+// this was fine for building API that sends and recieves json
+// but now our app is going to be Full-Stack. That means handling front-end and back-end from the same server (in this case)
+//const app = express()
+// This is the new app
+const app = require("liquid-express-views")(express())
 
 
 ///////////////////////////////////
@@ -29,12 +32,23 @@ middleware(app)
 ///           Routes            ///
 ///////////////////////////////////
 app.get('/', (req, res) => {
-    res.send('Server is live, ready for requests')
+    const { username, loggedIn, userId } = req.session
+    res.render('home.liquid', { username, loggedIn, userId })
 })
 
 app.use('/fruits', FruitRouter)
 app.use('/users', UserRouter)
 app.use('/comments', CommentRouter)
+
+app.get('/error', (req,res) => {
+    const error = req.query.error || 'This page does not exist'
+    const { username, loggedIn, userId } = req.session
+    res.render('home.liquid', { username, loggedIn, userId })
+})
+// catchall route
+app.all('*', (req,res) => {
+    res.redirect('/error')
+})
 
 ///////////////////////////////////
 ///        Server Listener      ///
